@@ -7,3 +7,4 @@ This project aims to recognize human hand gestures by using keypoints generated 
 | Algorithm     | Accuracy      |
 | ------------- |:-------------:|
 | Random Forest | 87.8%         |
+| SVM           | 77.6%         |
