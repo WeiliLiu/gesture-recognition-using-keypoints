@@ -8,3 +8,11 @@ This project aims to recognize human hand gestures by using keypoints generated 
 | ------------- |:-------------:|
 | Random Forest | 87.8%         |
 | SVM           | 77.6%         |
+
+Download [Model](https://drive.google.com/file/d/1oh0DknHVdfcpaSFqqqNjmXNoij-ETgnh/view?usp=sharing)
+
+Put the model under demo folder and run
+
+```
+python3 webcam.py
+```
