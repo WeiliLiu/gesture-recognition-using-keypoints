@@ -224,8 +224,36 @@ def palm_center(keypoints):
     return center, radius
 
 def absolute(center):
-    screen_width, screen_height = pyautogui.size()
+    # screen_width, screen_height = pyautogui.size()
+    screen_width, screen_height = 2560, 1600
     pyautogui.moveTo(center[0] * screen_width / camera_resolution[0], center[1] * screen_height / camera_resolution[1], _pause=False)
+
+def map_label_to_gesture(label):
+    lab2ges = {
+        0: 'Zero',
+        1: 'One',
+        2: 'Two',
+        3: 'Three',
+        4: 'Four',
+        5: 'Five',
+        6: 'Six',
+        7: 'Seven',
+        8: 'Eight',
+        9: 'Nine'
+    }
+
+    if label not in lab2ges:
+        return 'Unkown'
+
+    return lab2ges[label]
+
+def mouse_command(gesture):
+    if gesture == 'Two':
+        pyautogui.click()
+    elif gesture == 'Six':
+        pyautogui.doubleClick()
+    elif gesture == 'one':
+        pyautogui.click(button=3)
 
 cap = cv2.VideoCapture(0)
 
@@ -261,7 +289,16 @@ while True:
         model_input[::2] = model_input[::2] / model_input[0]
         model_input[1::2] = model_input[1::2] / model_input[1]
         
-        print(loaded_model.predict(model_input.reshape((1, -1))))
+        # print(loaded_model.predict(model_input.reshape((1, -1))))
+
+        probs = loaded_model.predict_proba(model_input.reshape((1, -1)))
+        top_prob = np.max(probs)
+        if top_prob > 0.1:
+            gesture = map_label_to_gesture(np.argmax(probs))
+        else:
+            gesture = 'No Gesture'
+
+        mouse_command(gesture)
 
         center, radius = palm_center(keypoints)
         center_queue.appendleft(center)
@@ -270,6 +307,13 @@ while True:
     
         # Cursor movement
         absolute(center_mean)
+    else:
+        gesture = "No hand detected"
+
+    # putting the recognized gesture on the frame
+    cv2.putText(frame, str('Gesture: ' + gesture), (7, 30), cv2.FONT_HERSHEY_SIMPLEX,
+        1, (100, 255, 0), 3, cv2.LINE_AA)
+    print(gesture)
     
     cv2.rectangle(frame ,(350, 100),(550, 300),(255, 0, 0), 2)
     cv2.imshow("MediaPipe Hands", frame)
